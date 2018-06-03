@@ -21,21 +21,30 @@ We will cover two ways to write the image to a SD card. One method is to use Etc
 
 > **NOTE:** If you are using Windows or MacOS you have to use Etcher.
 
-## Step 2: Using Etcher (Easy method)
+## Step 2a: Using Etcher (Easy method)
 
-First you need to download Etcher. You can do this by clicking [here](https://etcher.io/) ...
+First you need to download Etcher. You can do this by clicking [here](https://etcher.io/) and this will take you website as shown below:
 
-(NOT FINISHED)
+![etcher](img/p1.JPG)
 
-## Step 2: Using `dd` command (Advanced method, Linux only)
+Click Download. Navigate to the Download directory and double click `Etcher-Setup-1.4.4-x64.exe` and follow installation instructions.
+
+Once installed you can run Etcher:
+
+Insert the SD card into your computer. It will show up in etcher.
+
+> **NOTE:** Make you don't have any important data on your SD card. After this process the SD will be wiped.
+
+Download the zip from raspberrypi website. Extract the img from the zip file by dobule clicking
+
+## Step 2b: Using `dd` command (Advanced method, Linux only)
 
 > **NOTE:** You can skip this step if you completed *Step 2: Using Etcher (Easy method)*.
 
 To use the `dd` command you will have to be on Linux and have root privileges. There are well written instructions on the pi website [here](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md) or you can use the instructions below.
 
-> **WARNING:** The `dd` command is very powerful and if used inappropriately is able to wipe all the data from your hard drive. Make sure to read the instructions carefully. Note, displayed information may vary depending on your system setup.
+> **WARNING:** The `dd` command is very powerful and if used inappropriately is able to wipe all the data from your hard drive. Make sure to read the instructions carefully. Also note, displayed information may vary depending on your system setup.
 
-(NOT FINISHED)
 
 After inserting the SD card into the computer, use the `lsblk` command to list the block devices.
 
@@ -72,8 +81,6 @@ Now write the image to the SD card. It is very important that you **DON'T** spec
 ```bash
 $ sudo dd of=/dev/mmcblk0 if=2018-04-18-raspbian-stretch-lite.img bs=4M conv=fsync
 ```
-
-(NOT FINISHED)
 
 ## Step 3: Before you plug your SD card into Pi
 
@@ -194,7 +201,7 @@ $ sudo nmtui
 ```
 Will open a text based GUI:
 
-```bash
+```text
 ┌─┤ NetworkManager TUI ├──┐
 │                         │
 │ Please select an option │
