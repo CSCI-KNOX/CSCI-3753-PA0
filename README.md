@@ -23,11 +23,11 @@ We will cover two ways to write the image to a SD card. One method is to use Etc
 
 ## Step 2a: Using Etcher (Easy method)
 
-First you need to download Etcher. You can do this by clicking [here](https://etcher.io/) and this will take you website as shown below:
+First you need to download Etcher. You can do this by clicking [here](https://etcher.io/) and this will take you to the website, shown below:
 
 ![etcher](img/p1.JPG)
 
-Click Download. Navigate to the Download directory and double click `Etcher-Setup-1.4.4-x64.exe` and follow installation instructions.
+Click Download. Navigate to the `Download` directory and double click `Etcher-Setup-1.4.4-x64.exe` and follow installation instructions.
 
 Once installed you can run Etcher:
 
@@ -92,7 +92,7 @@ There are a few more steps needed before you can plug in your SD card into Pi.
 
 After writing image to your SD, unplug and plug your SD card back into your computer. Two partition will be mounted, `/media/demu/boot` and `/media/demu/rootfs`. Add an empty file to the `/media/demu/boot` partition, name it `ssh`.
 
-```bash
+```text
 cd /media/demu/boot
 touch ssh
 ```
@@ -149,7 +149,7 @@ $ sudo systemctl stop dhcpcd.service
 
 Make sure that dhcpcd is disable and stopped with `systemctl status dhcpcd.service` command.
 
-```bash
+```text
 $ sudo systemctl status dhcpcd.service
 ● dhcpcd.service - dhcpcd on all interfaces
    Loaded: loaded (/lib/systemd/system/dhcpcd.service; disabled; vendor preset: enabled)
