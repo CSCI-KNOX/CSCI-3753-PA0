@@ -10,6 +10,6 @@ echo "\\n\\n" >> /tmp/slack.data.txt
 ifconfig wlan0 >> /tmp/slack.data.txt
 echo \"}    >> /tmp/slack.data.txt
 curl -X POST -H 'Content-type: application/json' --data @/tmp/slack.data.txt \
-	      https://hooks.slack.com/services/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 \
+	      https://hooks.slack.com/services/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 \
        &&  echo slack message sent ||  echo error sending slack msg
 
