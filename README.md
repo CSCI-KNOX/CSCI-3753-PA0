@@ -191,6 +191,12 @@ A simpler and more secure way to access it is to connect the ethernet from Pi to
 <img src="img/local-setup.jpg" alt="local setup with 3.0 USB Hub" width=400>
 
 
+You need to make your PC or Mac's network connection shared with the Raspberry Pi.  Share the USB Hub connection with the WiFI on the Mac.
+
+<img src="img/sharing-network.png" alt="Sharing local WiFi with Raspberry Pi connected by 3.0 USB Hub" width=400>
+
+
+
 ## Step 6: Remotely access your Raspberry Pi
 
 <!-- show the steps for ssh-ing to the rpi-->
