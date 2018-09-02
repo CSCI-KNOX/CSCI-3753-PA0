@@ -8,16 +8,16 @@ This assignment will guide you through the setup of the Pi3 that will be used in
 
 You will need the following materials:
 
-1. Pi 3
+1. Raspberry Pi 3
 2. A 8 GB (or 16 GB) micro SD card
 3. A micro SD to SD adapter (or micro SD to USB adapter)
 4. A computer that has a SD card reader or a USB to SD card reader adapter
 
 ## Step 1: Download image from Raspberry Pi Website
 
-We will be using a command line only version of Linux called Raspian Lite. Download the zip file from [Raspian Lite](https://www.raspberrypi.org/downloads/raspbian/).
+We will be using a command line only version of Linux called Raspian Lite. Download the file from [Raspian Lite](https://www.raspberrypi.org/downloads/raspbian/).  This is 367 MB for the 2018-06-27 release.
 
-Extract the image file (\*.img) from the zipped file.  We are now ready to install the operating system on the SD card.
+Extract the image file (\*.img) if you downloaded the zipped file.  We are now ready to install the operating system on the SD card.
 
 Raspbian is the Raspberry Pi Foundation’s official supported operating system. You can download the image below and follow their [installation guide]( https://www.raspberrypi.org/documentation/installation/installing-images/README.md) or you can follow our step by step instructions listed below.
 
@@ -31,25 +31,72 @@ We will cover two ways to write the image to a SD card. One method is to use Etc
 
 First you need to download Etcher. You can do this by clicking [here](https://etcher.io/) and this will take you to the website, shown below:
 
-![etcher](img/p1.JPG)
+<img src="img/etcher.JPG" alt="Etcher" width=400>
 
 Click Download. Navigate to the `Download` directory and double click `Etcher-Setup-1.4.4-x64.exe` and follow installation instructions.
 
-Once installed you can run Etcher.  Now insert the SD card into your computer. It will show up in Etcher.
+Once installed you can run Etcher.  Now insert the SD card into your computer. It will show up in Etcher.  Select the image you just downloaded (using 2018-06-27-raspbian-stretch-lite.img in the example).  
 
-Download the zip from raspberrypi website. Extract the img from the zip file by dobule clicking
+<img src="img/etcher-flash.png" alt="Etcher" width=400>
+
+Flash the drive (press the Flash button).  This may take a while to complete.  You will see the progress reported in the button.
+<img src="img/etcher-42.png" alt="Etcher" width=400>
+Once the process is complete, you can exit the Etcher application.
 
 ## Step 2b: Using `?????` command (Advanced method, MacOS only)
 
-> **NOTE:** You can skip this step if you completed *Step 2: Using Etcher (Easy method)*.
+> **NOTE: You can skip this step if you completed *Step 2: Using Etcher (Easy method)*** .
 
-To use the `dd` command you will have to be on Linux and have root privileges. There are well written instructions on the pi website [here](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md) or you can use the instructions below.
+To use the `dd` command you will have to be on Linux and have root privileges. There are well written instructions on the pi website [here](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md) or you can use the instructions below.  The SD card shows up as a devices rdisk2 and rdisk2s1.
+
+```text
+someones-MacBook-Pro:~ David$ ls /dev | grep rdisk
+rdisk0
+rdisk0s1
+rdisk0s2
+rdisk0s3
+rdisk1
+someones-MacBook-Pro:~ David$ echo placed the SD card into machine
+placed the SD card into machine
+someones-MacBook-Pro:~ David$ ls /dev | grep rdisk
+rdisk0
+rdisk0s1
+rdisk0s2
+rdisk0s3
+rdisk1
+rdisk2
+rdisk2s1
+```
+After the 16 GB micro SD card is mounted we can see the disk devices using `diskutil` on a Mac. Use the `lsblk` command to list the block devices in Linux.
+
+
+```text
+someones-MacBook-Pro:~ David$ diskutil list
+/dev/disk0 (internal, physical):
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:      GUID_partition_scheme                        *500.3 GB   disk0
+   1:                        EFI EFI                     209.7 MB   disk0s1
+   2:          Apple_CoreStorage Macintosh HD            499.4 GB   disk0s2
+   3:                 Apple_Boot Recovery HD             650.0 MB   disk0s3
+
+/dev/disk1 (internal, virtual):
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:                  Apple_HFS Macintosh HD           +499.0 GB   disk1
+                                 Logical Volume on disk0s2
+                                 21447694-4EF6-4C4E-9874-9ED5CBDEDA19
+                                 Unencrypted
+
+/dev/disk2 (internal, physical):
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *15.9 GB    disk2
+   1:             Windows_FAT_32 NO NAME                 15.9 GB    disk2s1
+```
 
 > **WARNING:** The `dd` command is very powerful and if used inappropriately is able to wipe all the data from your hard drive. Make sure to read the instructions carefully. Also note, displayed information may vary depending on your system setup.
 
 <!--
-After inserting the SD card into the computer, use the `lsblk` command to list the block devices.
-
+After inserting the SD card into the computer, use the `lsblk` command to list the block devices in Linux.
+Here is an example on a Linux machine:
 ```bash
 $ lsblk
 NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -60,6 +107,7 @@ mmcblk0     179:0    0  14.9G  0 disk
 ├─mmcblk0p1 179:1    0  43.1M  0 part /media/my_sd_card/boot
 └─mmcblk0p2 179:2    0   1.7G  0 part /media/my_sd_card/rootfs
 ```
+
 
 If the SD card is partitioned, Linux will mount them automatically. Before writing the new image unmount the partitions with the following commands:
 ```bash
@@ -86,11 +134,12 @@ $ sudo dd of=/dev/mmcblk0 if=2018-04-18-raspbian-stretch-lite.img bs=4M conv=fsy
 -->
 ## Step 3: Before you plug your SD card into Pi
 
-There are a few more steps needed before you can plug in your SD card into Pi.
+Before moving the micro SD card to the Raspberry Pi 3, we need to perform a couple of more steps to enable access over network.
 
+<!--
 ### Step 3.1: Enabling local networking
 
-Much of the following information is taken from https://www.thepolyglotdeveloper.com/2016/06/connect-raspberry-pi-zero-usb-cable-ssh/
+Much of the following information is taken from [Nic Raboy's]( https://www.thepolyglotdeveloper.com/2016/06/connect-raspberry-pi-zero-usb-cable-ssh/) description for a Raspberry Pi Zero.  The Pi Zero does not have enough processing power or memory for use in this course.
 
 For more information about ethernet of USB, visit: http://www.linux-usb.org/usbnet/
 
@@ -107,11 +156,11 @@ The above line will set us up for the next file that we alter. The next file we 
 modules-load=dwc2,g_ether
 ```
 The above parameter should be added after the `rootwait` parameter. Yes the above parameter is a single parameter, meaning don’t add a bunch of space characters within it. More information on networking over USB on Linux can be found [here](http://www.linux-usb.org/usbnet/).
-
+-->
 
 ### Step 3.1: Enabling Remote Access
 
-> **NOTE:** This step can be skipped if you only use a direct connection to your Pi or only use your Pi with a monitor and keyboard.
+> **NOTE:** This step can be skipped if you ONLY use a direct connection to your Pi or ONLY use your Pi with a monitor and keyboard.  If you want to access the Pi remotely, you will need to perform this step.
 
 The Raspberry Pi Foundation is disabling SSH (Secure SHell) by default in Raspbian as a security precaution. More information on the subject can be found [here](https://www.raspberrypi.org/blog/a-security-update-for-raspbian-pixel/).
 To enable SSH, we will be adding a file called `ssh`  to the `boot` partition on the SD card.  The file can be blank, and it has no extensions. It should exist at the same location as the other files that were edited above.  The boot directory is read during the booting of the Pi and if a file named `ssh` is found in the directory, then SSH is enabled at boot time.  This is useful if we don't have a monitor to login and enable SSH manually after each boot of the Pi.
@@ -131,13 +180,94 @@ Now you can now connect the power back to the Raspberry Pi and you can watch the
 
 If you have a display attached, you should see the boot messages printed on the screen.  
 
-## Step 5: Remotely access your Raspberry Pi
 
---- show the steps for ssh-ing to the rpi
+## Step 5: Connecting your Raspberry Pi to the network
+The easiest method for communicating with the Pi is using the ethernet connection.  If you have a power supply, you can connect your Pi's ethernet to your local or WiFi router.  This will allow you to access your Pi from any device connected to the wireless.  If you have a static IP address you will be able to access the Pi from remote locations by knowing its IP address.
 
-## Step 6: Setting up WiFi (optional)
+A simpler and more secure way to access it is to connect the ethernet from Pi to the laptop.  If your laptop has an ethernet connector you can just plug it in.  If you only have USB connections, I suggest you invest in a USB to internet device.  (See [USB 3.0 hub](https://www.amazon.com/CableCreation-Ethernet-Aluminum-Durable-Braided/dp/B01FJQGB0M) )
 
---- show thte steps for setting up local WIFI and remote WiFi
+
+## Step 6: Remotely access your Raspberry Pi
+
+<!-- show the steps for ssh-ing to the rpi-->
+
+Use `ping` command to see if the raspberry pi is connected.  The default hostname is `raspberrypi` and we only want to access it on the local network.
+```text
+someones-MacBook-Pro:~ David$ ping raspberrypi.local
+PING raspberrypi.local (169.254.224.216): 56 data bytes
+Request timeout for icmp_seq 0
+64 bytes from 169.254.224.216: icmp_seq=1 ttl=64 time=0.385 ms
+64 bytes from 169.254.224.216: icmp_seq=2 ttl=64 time=0.386 ms
+```
+If the Pi is available, you will see successfull transfer of bytes with the number of milliseconds (ms) it took to transfer.
+
+Let's try to remotely connect to the Raspberry Pi using SSH by logging in as user `pi`.  
+```text
+someones-MacBook-Pro:~ David$ ssh pi@raspberrypi.local
+```
+
+You may encounter a problem with security if you have connected to a different Raspberry Pi before.  This may also occur when you change local networks.  You may see a message like the following:
+```text
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@       WARNING: POSSIBLE DNS SPOOFING DETECTED!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+The ECDSA host key for raspberrypi.local has changed,
+and the key for the corresponding IP address fe80::8a0a:acb6:98e4:ac33%en5
+is unknown. This could either mean that
+DNS SPOOFING is happening or the IP address for the host
+and its host key have changed at the same time.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:rwYWWIq3DgExn55WRmU1dZ5jxUbVG3tQNGv3UwNB4+Q.
+Please contact your system administrator.
+Add correct host key in /Users/David/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /Users/David/.ssh/known_hosts:7
+ECDSA host key for raspberrypi.local has changed and you have requested strict checking.
+Host key verification failed.
+```
+
+You can easily fix this error by editing the `/Users/David/.ssh/known_hosts` file and removing the entry for `raspberrypi` from the known hosts.
+
+Repeat the SSH command and you should receive the message below.  You must type `yes` at the prompt, `y` will not work.
+
+```text
+someones-MacBook-Pro:~ David$ ssh pi@raspberrypi.local
+The authenticity of host 'raspberrypi.local (fe80::8a0a:acb6:98e4:ac33%en5)' can't be established.
+ECDSA key fingerprint is SHA256:rwYWWIq3DgExn55WRmU1dZ5jxUbVG3tQNGv3UwNB4+Q.
+Are you sure you want to continue connecting (yes/no)? yes
+```
+Type `yes` and press return to continue.  The new connection is recorded and the Raspberry Pi is now asking for the password associated with the user `pi` that was specified in the SSH command.   The default password for the user is `raspberry`.
+
+```text
+Warning: Permanently added 'raspberrypi.local,fe80::8a0a:acb6:98e4:ac33%en5' (ECDSA) to the list of known hosts.
+pi@raspberrypi.local's password:
+```
+Enter `raspberry` and the system will allow you to login.
+
+```text
+Linux raspberrypi 4.14.50-v7+ #1122 SMP Tue Jun 19 12:26:26 BST 2018 armv7l
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+SSH is enabled and the default password for the 'pi' user has not been changed.
+This is a security risk - please login as the 'pi' user and type 'passwd' to set a new password.
+
+pi@raspberrypi:~ $
+```
+
+## Step 6a: Setting up WiFi (optional)
+
+--- show the steps for setting up local WIFI and remote WiFi
 
 
 ## Step 7: Download Source code and Tools for Linux
