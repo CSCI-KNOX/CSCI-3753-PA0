@@ -1,6 +1,6 @@
-# Programming Assignment Zero (First Draft)
-
-##### CSCI 2753: Operating Systems, 2018
+# Programming Assignment Zero (Version: 1.0)
+## CSCI 3753: Operating Systems, Fall 2018
+## Description assume use of Raspberry Pi 3
 
 ## Introduction:
 
