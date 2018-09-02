@@ -186,6 +186,8 @@ The easiest method for communicating with the Pi is using the ethernet connectio
 
 A simpler and more secure way to access it is to connect the ethernet from Pi to the laptop.  If your laptop has an ethernet connector you can just plug it in.  If you only have USB connections, I suggest you invest in a USB to internet device.  (See [USB 3.0 hub](https://www.amazon.com/CableCreation-Ethernet-Aluminum-Durable-Braided/dp/B01FJQGB0M) )
 
+<img src="img/local-setup.JPG" alt="Etcher" width=400>
+
 
 ## Step 6: Remotely access your Raspberry Pi
 
@@ -265,6 +267,11 @@ This is a security risk - please login as the 'pi' user and type 'passwd' to set
 pi@raspberrypi:~ $
 ```
 
+*** The only problem is that we cannot talk to the rest of the world.  We cannot download the other items needed ***
+???? HOW DO WE ROUTE REQUESTS THRU A LOCAL ?????
+
+
+
 ## Step 6a: Setting up WiFi (optional)
 
 --- show the steps for setting up local WIFI and remote WiFi
@@ -277,7 +284,7 @@ pi@raspberrypi:~ $
 Now let's install necessary programs.
 
 ```text
-sudo apt install git bc vim libncurses5-dev make gcc ccache
+sudo apt install git vim libncurses5-dev make gcc ccache
 ```
 
 ### 7.2 Download Source
