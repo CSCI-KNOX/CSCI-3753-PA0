@@ -37,7 +37,7 @@ Click Download. Navigate to the `Download` directory and double click `Etcher-Se
 
 Once installed you can run Etcher.  Now insert the SD card into your computer. It will show up in Etcher.  Select the image you just downloaded (using 2018-06-27-raspbian-stretch-lite.img in the example).  
 
-<img src="img/etcher-flash.png" alt="Etcher" width=400>
+<img src="img/etcher-flash.png" alt="Etcher Flash Button" width=400>
 
 Flash the drive (press the Flash button).  This may take a while to complete.  You will see the progress reported in the button.
 
@@ -188,7 +188,7 @@ The easiest method for communicating with the Pi is using the ethernet connectio
 
 A simpler and more secure way to access it is to connect the ethernet from Pi to the laptop.  If your laptop has an ethernet connector you can just plug it in.  If you only have USB connections, I suggest you invest in a USB to internet device.  (See [USB 3.0 hub](https://www.amazon.com/CableCreation-Ethernet-Aluminum-Durable-Braided/dp/B01FJQGB0M) )
 
-<img src="img/local-setup.JPG" alt="local setup with 3.0 USB Hub" width=400>
+<img src="img/local-setup.jpg" alt="local setup with 3.0 USB Hub" width=400>
 
 
 ## Step 6: Remotely access your Raspberry Pi
