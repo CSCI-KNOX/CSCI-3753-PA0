@@ -390,17 +390,19 @@ In the general setup menu, we want to select the name of our kernel version.  It
 Replace `-v7` with your name. Tab to the top directory and select `<Save>` and save it to the .config file (default).  Use left arrow to select the `Exit` from the general setup menu and left arrow again to select `Exit` from the `menuconfig` application.
 
 ### 7.3 Compile the Kernel
+We need to compile the kernel.  This will take about two and a half hours the first time.  We are using the ccache utility to make subsequent compiles much faster.  The `make` utility will compile all the required sources. The `-j4` specifies that 4 threads should be used to perform the build.  `CC=`  is setting all compulations to use the GCC compiler with the `ccache` utility.  The other items on the command line are the names of the items to build.  `zImage` is a zipped version of the kernel.  When the system boots, it can decompress the kernel as it moves it into memory.  This allows us to move the kernel around quicker and allows more kernel versions to be stored in the space limited boot partition.
 
 ```text
 make -j4 CC="ccache gcc" modules dtbs zImage
 ```
 
-This will take about two and a half hours the first time.  We are using the ccache utility to make subsequent compiles much faster.
+We will also need to make all the modules for the kernel and move them to the correct locations for distribution.
 
 ```text
-sudo make modules_install
+make modules_install
 ```
-Make sure to replace `<kernel_name>` with any name except the default's kernel name (i.e. `kernel7`).
+
+Make sure to replace `<kernel_name>` with any name except the default's kernel name (i.e. `kernel7`).  Each command is prefaced with `sudo` because normal users do not have access to write into the boot directory.
 ```text
 sudo cp arch/arm/boot/dts/*.dtb /boot/
 sudo cp arch/arm/boot/dts/overlays/*.dtb* /boot/overlays/
