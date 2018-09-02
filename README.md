@@ -190,11 +190,33 @@ A simpler and more secure way to access it is to connect the ethernet from Pi to
 
 <img src="img/local-setup.jpg" alt="local setup with 3.0 USB Hub" width=400>
 
+### Step 5a: Connecting your Raspberry Pi to a Mac OS X machine
 
-You need to make your PC or Mac's network connection shared with the Raspberry Pi.  Share the USB Hub connection with the WiFI on the Mac.
+You need to make your PC or Mac's network connection shared with the Raspberry Pi.  Share the USB Hub connection with the WiFI on the Mac by accessing the sharing in the system preferences.
 
 <img src="img/sharing-network.png" alt="Sharing local WiFi with Raspberry Pi connected by 3.0 USB Hub" width=400>
 
+### Step 5b: Connecting your Raspberry Pi to a Windows PC
+
+Here are the steps to share your Windows PC's wireless internet connection with a Pi:
+
+* Connect the Pi to PC's ethernet port using a regular ethernet cable
+
+* Go to "Network Connections" on the Windows PC and select the "Wireless Network Connection"
+
+* Right-click and select properties. In the "Sharing" tab under "Internet Connection Sharing" enable both checkboxes.
+
+* Restart your PC.
+   * This step is very important.
+   * Now your Pi will obtain an IP address from your PC and can access internet through your PC
+
+* If need to find the IP address of the Pi to SSH or to remote login from the PC
+   * run `ping raspberrypi` command
+   * where "raspberrypi" is the hostname of your Pi
+
+* If you need additional details with screenshots on how to share internet connection
+   * try visiting: [Connecting to Pi from Laptop's Ethernet Port](http://carbonstone.blogspot.com/2014/02/connecting-to-pi-from-laptops-ethernet.html).  
+   * It explains how to connect to Pi through the Ethernet port on a Windows machine.
 
 
 ## Step 6: Remotely access your Raspberry Pi
