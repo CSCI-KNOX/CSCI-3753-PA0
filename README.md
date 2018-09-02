@@ -45,11 +45,14 @@ Flash the drive (press the Flash button).  This may take a while to complete.  Y
 
 Once the process is complete, you can exit the Etcher application.
 
-## Step 2b: Using `?????` command (Advanced method, MacOS only)
+## Step 2b: Using `dd` command (Advanced method, Mac OS X example)
 
-> **NOTE: You can skip this step if you completed *Step 2: Using Etcher (Easy method)*** .
+> ** NOTE: **  You can skip this step if you completed: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Step 2: Using Etcher (Easy method)`
 
-To use the `dd` command you will have to be on Linux and have root privileges. There are well written instructions on the pi website [here](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md) or you can use the instructions below.  The SD card shows up as a devices rdisk2 and rdisk2s1.
+To use the `dd` command you will have to be in a terminal window and have root privileges. There are well written instructions on the pi website [here](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md) or you can use the instructions below.
+In this example, we are looking at the raw disk devices available on the system before and after the SD card is added.
+The SD card shows up as a devices rdisk2 and rdisk2s1.  We are interested in the rdisk2.
 
 ```text
 someones-MacBook-Pro:~ David$ ls /dev | grep rdisk
@@ -69,7 +72,7 @@ rdisk1
 rdisk2
 rdisk2s1
 ```
-After the 16 GB micro SD card is mounted we can see the disk devices using `diskutil` on a Mac. Use the `lsblk` command to list the block devices in Linux.
+After the 16 GB micro SD card is mounted we can see the disk devices using `diskutil` on a Mac. You can use the `lsblk` command to list the block devices in Linux (see man page) to get the equivalent information.
 
 
 ```text
@@ -93,8 +96,18 @@ someones-MacBook-Pro:~ David$ diskutil list
    0:     FDisk_partition_scheme                        *15.9 GB    disk2
    1:             Windows_FAT_32 NO NAME                 15.9 GB    disk2s1
 ```
+You can see that there is a device named /dev/disk2 that has 15.9 GB available.  We will use the raw device associated with the disk (`/dev/rdisk2` in this example).
 
-> **WARNING:** The `dd` command is very powerful and if used inappropriately is able to wipe all the data from your hard drive. Make sure to read the instructions carefully. Also note, displayed information may vary depending on your system setup.
+> **WARNING:** The `dd` command is very powerful and if used inappropriately is able to wipe all the data from your hard drive. Make sure to read the instructions carefully.
+<br><br>**Also Note:** the displayed information may vary depending on your system setup.
+
+
+```bash
+# make sure the output file is correct.  You can wipe out your disk
+# if you are not careful!!!
+sudo dd bs=1M if=2018-06-27-raspbian-stretch-lite.img of=/dev/rdisk2
+```
+
 
 <!--
 After inserting the SD card into the computer, use the `lsblk` command to list the block devices in Linux.
@@ -160,10 +173,11 @@ modules-load=dwc2,g_ether
 The above parameter should be added after the `rootwait` parameter. Yes the above parameter is a single parameter, meaning don’t add a bunch of space characters within it. More information on networking over USB on Linux can be found [here](http://www.linux-usb.org/usbnet/).
 -->
 
+<!--
 ### Step 3.1: Enabling Remote Access
 
 > **NOTE:** This step can be skipped if you ONLY use a direct connection to your Pi or ONLY use your Pi with a monitor and keyboard.  If you want to access the Pi remotely, you will need to perform this step.
-
+-->
 The Raspberry Pi Foundation is disabling SSH (Secure SHell) by default in Raspbian as a security precaution. More information on the subject can be found [here](https://www.raspberrypi.org/blog/a-security-update-for-raspbian-pixel/).
 To enable SSH, we will be adding a file called `ssh`  to the `boot` partition on the SD card.  The file can be blank, and it has no extensions. It should exist at the same location as the other files that were edited above.  The boot directory is read during the booting of the Pi and if a file named `ssh` is found in the directory, then SSH is enabled at boot time.  This is useful if we don't have a monitor to login and enable SSH manually after each boot of the Pi.
 
@@ -210,9 +224,11 @@ Here are the steps to share your Windows PC's wireless internet connection with 
    * This step is very important.
    * Now your Pi will obtain an IP address from your PC and can access internet through your PC
 
+<!--
 * If need to find the IP address of the Pi to SSH or to remote login from the PC
    * run `ping raspberrypi` command
    * where "raspberrypi" is the hostname of your Pi
+-->
 
 * If you need additional details with screenshots on how to share internet connection
    * try visiting: [Connecting to Pi from Laptop's Ethernet Port](http://carbonstone.blogspot.com/2014/02/connecting-to-pi-from-laptops-ethernet.html).  
@@ -297,21 +313,35 @@ This is a security risk - please login as the 'pi' user and type 'passwd' to set
 pi@raspberrypi:~ $
 ```
 
-*** The only problem is that we cannot talk to the rest of the world.  We cannot download the other items needed ***
-???? HOW DO WE ROUTE REQUESTS THRU A LOCAL ?????
-
-
-
 ## Step 6a: Setting up WiFi (optional)
 
---- show the steps for setting up local WIFI and remote WiFi
+```
+The steps for setting up local WIFI and remote WiFi are available if you would like them.  
+Contact me for the latest version of the instructions.
+```
 
-
-## Step 7: Download Source code and Tools for Linux
+## Step 7: Building the Kernel
 
 ### 7.1 Download Tools
 
 Now let's install necessary programs.
+The `apt` application provides a high-level command line interface for the package management system. It is intended as an end
+       user interface and enables some options better suited for interactive usage by default compared to more
+       specialized APT tools like apt-get(8) and apt-cache(8). (see man pages)
+
+We want to install the six packages and any packages on which the ones being installed are dependent.  The packages ate:
+
+ `git` - Git is a version control system, a tool that tracks changes to your code and shares those changes with others. Git is most useful when combined with GitHub, a website that allows you to share your code.
+
+ `vim` - Vim is a highly configurable text editor for efficiently creating and changing any kind of text.
+
+ `libncurses5-dev` - The ncurses library routines are a terminal- independent method of updating character screens with reasonable optimization.
+
+ `make` - Utility for directing compilation. GNU Make is a utility which controls the generation of executables and other target files of a program from the program's source.
+
+ `gcc` - GNU Compiler Collection (base package).
+
+ `ccache` - A compiler cache. It speeds up recompilation by caching previous compilations and detecting when the same compilation is being done again.
 
 ```text
 sudo apt install git vim libncurses5-dev make gcc ccache
@@ -349,7 +379,7 @@ To edit .config file using a menu run:
 ```text
 make menuconfig
 ```
-Once the character based menuing is displayed, scroll down to select:
+Once the character based menu is displayed, scroll down to select:
 ```text
 General setup --->
 ```
