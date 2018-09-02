@@ -1,6 +1,6 @@
 # Programming Assignment Zero (First Draft)
 
-##### CSCI 2753: Operating Systems, String 2018
+##### CSCI 2753: Operating Systems, 2018
 
 ## Introduction:
 
@@ -9,17 +9,23 @@ This assignment will guide you through the setup of the Pi3 that will be used in
 You will need the following materials:
 
 1. Pi 3
-2. A 8 GB mini SD card
-3. A SD to mini SD adapter (if you don't have one, borrow one from your TA)
+2. A 8 GB (or 16 GB) micro SD card
+3. A micro SD to SD adapter (or micro SD to USB adapter)
 4. A computer that has a SD card reader or a USB to SD card reader adapter
 
-> **NOTE:** Pi2 can be used but a wired connect is needed at all times!
+## Step 1: Download image from Raspberry Pi Website
 
-## Step 1: Writing image to SD card
+We will be using a command line only version of Linux called Raspian Lite. Download the zip file from [Raspian Lite](https://www.raspberrypi.org/downloads/raspbian/).
 
-We will cover two ways to write the image to a SD card. One method is to use Etcher, a tool that allows you to flash OS images to SD cards. Etcher works on Windows, MacOS, and Linux. The other is a more advance way using the command line (CLI) on a Linux system. First we will cover Etcher, then the more advanced `dd` command.
+Extract the image file (\*.img) from the zipped file.  We are now ready to install the operating system on the SD card.
 
-> **NOTE:** If you are using Windows or MacOS you have to use Etcher.
+Raspbian is the Raspberry Pi Foundation’s official supported operating system. You can download the image below and follow their [installation guide]( https://www.raspberrypi.org/documentation/installation/installing-images/README.md) or you can follow our step by step instructions listed below.
+
+## Step 2: Writing image to SD card
+
+> **NOTE:** Make sure you don't have any important data on your SD card. After this process the SD will be wiped.
+
+We will cover two ways to write the image to a SD card. One method is to use Etcher, a tool that allows you to flash OS images to SD cards. Etcher works on Windows, MacOS, and Linux. The other is a more advance way using the command line (CLI) on a MacOS or Linux  system. First we will cover Etcher, then the more advanced `dd` command.
 
 ## Step 2a: Using Etcher (Easy method)
 
@@ -29,15 +35,11 @@ First you need to download Etcher. You can do this by clicking [here](https://et
 
 Click Download. Navigate to the `Download` directory and double click `Etcher-Setup-1.4.4-x64.exe` and follow installation instructions.
 
-Once installed you can run Etcher:
-
-Insert the SD card into your computer. It will show up in etcher.
-
-> **NOTE:** Make you don't have any important data on your SD card. After this process the SD will be wiped.
+Once installed you can run Etcher.  Now insert the SD card into your computer. It will show up in Etcher.
 
 Download the zip from raspberrypi website. Extract the img from the zip file by dobule clicking
 
-## Step 2b: Using `dd` command (Advanced method, Linux only)
+## Step 2b: Using `?????` command (Advanced method, MacOS only)
 
 > **NOTE:** You can skip this step if you completed *Step 2: Using Etcher (Easy method)*.
 
@@ -45,7 +47,7 @@ To use the `dd` command you will have to be on Linux and have root privileges. T
 
 > **WARNING:** The `dd` command is very powerful and if used inappropriately is able to wipe all the data from your hard drive. Make sure to read the instructions carefully. Also note, displayed information may vary depending on your system setup.
 
-
+<!--
 After inserting the SD card into the computer, use the `lsblk` command to list the block devices.
 
 ```bash
@@ -55,14 +57,14 @@ sda           8:0    0 119.2G  0 disk
 ├─sda1        8:1    0   512M  0 part /boot/efi
 └─sda2        8:2    0 118.8G  0 part /
 mmcblk0     179:0    0  14.9G  0 disk
-├─mmcblk0p1 179:1    0  43.1M  0 part /media/demu/boot
-└─mmcblk0p2 179:2    0   1.7G  0 part /media/demu/rootfs
+├─mmcblk0p1 179:1    0  43.1M  0 part /media/my_sd_card/boot
+└─mmcblk0p2 179:2    0   1.7G  0 part /media/my_sd_card/rootfs
 ```
 
 If the SD card is partitioned, Linux will mount them automatically. Before writing the new image unmount the partitions with the following commands:
 ```bash
-$ sudo umount /media/demu/boot
-$ sudo umount /media/demu/rootfs
+$ sudo umount /media/my_sd_card/boot
+$ sudo umount /media/my_sd_card/rootfs
 ```
 Run the `lsblk` command again. The `MOUNTPOINT` fields will be empty.
 
@@ -81,191 +83,156 @@ Now write the image to the SD card. It is very important that you **DON'T** spec
 ```bash
 $ sudo dd of=/dev/mmcblk0 if=2018-04-18-raspbian-stretch-lite.img bs=4M conv=fsync
 ```
-
+-->
 ## Step 3: Before you plug your SD card into Pi
 
 There are a few more steps needed before you can plug in your SD card into Pi.
 
-### Step 3.1: Enabling ssh on boot (no monitor)
+### Step 3.1: Enabling local networking
 
-> **NOTE:** This step can be skipped if you have a monitor connected to your Pi.
+Much of the following information is taken from https://www.thepolyglotdeveloper.com/2016/06/connect-raspberry-pi-zero-usb-cable-ssh/
 
-After writing image to your SD, unplug and plug your SD card back into your computer. Two partition will be mounted, `/media/demu/boot` and `/media/demu/rootfs`. Add an empty file to the `/media/demu/boot` partition, name it `ssh`.
+For more information about ethernet of USB, visit: http://www.linux-usb.org/usbnet/
+
+#### Configuring to Emulate Ethernet Over USB
+The long term goal is to use SSH over USB. This means we have to configure Raspbian to treat the USB port like an ethernet port. Mount the micro SD card in a computer (not Raspberry Pi) and open it with Finder, or Windows Explorer, or whatever it is that you use.
+
+There are multiple partitions on the device, but we are interested in the `boot` directory that is accessible from most any machine.  Within this directory we will open the file `confix.txt` for editing.  In this file you want to add the following line at the very bottom:
+```text
+dtoverlay=dwc2
+```
+
+The above line will set us up for the next file that we alter. The next file we alter is `cmdline.txt`, but it is a bit different. Parameters in this file are not delimited by new lines or commas, they are delimited by space characters. In this file we want to add the following:
+```text
+modules-load=dwc2,g_ether
+```
+The above parameter should be added after the `rootwait` parameter. Yes the above parameter is a single parameter, meaning don’t add a bunch of space characters within it. More information on networking over USB on Linux can be found [here](http://www.linux-usb.org/usbnet/).
+
+
+### Step 3.1: Enabling Remote Access
+
+> **NOTE:** This step can be skipped if you only use a direct connection to your Pi or only use your Pi with a monitor and keyboard.
+
+The Raspberry Pi Foundation is disabling SSH (Secure SHell) by default in Raspbian as a security precaution. More information on the subject can be found [here](https://www.raspberrypi.org/blog/a-security-update-for-raspbian-pixel/).
+To enable SSH, we will be adding a file called `ssh`  to the `boot` partition on the SD card.  The file can be blank, and it has no extensions. It should exist at the same location as the other files that were edited above.  The boot directory is read during the booting of the Pi and if a file named `ssh` is found in the directory, then SSH is enabled at boot time.  This is useful if we don't have a monitor to login and enable SSH manually after each boot of the Pi.
+
+In the following example, all remote file systems are mounted in the `/Volumes` directory and the device name is `my_sd_card`.  The `touch` command will change the data/time of the last modification of the given file.  If the file does not exist, `touch` will create it.
 
 ```text
-cd /media/demu/boot
+cd /Volumes/my_sd_card/boot
 touch ssh
 ```
 
- This will enable `ssh` by default (Pi only checks for this file on the first boot). This is useful if we don't have a monitor to login and enable `ssh` manually.
+## Step 4: Installing the micro SD card
+At this point the micro SD can be inserted into the Raspberry Pi. Make sure the power is disconnected from the Raspberry Pi before continuing.  If there is already a card in the computer, remove it. Now insert the micro SD card into the slot provided. The card will only work if installed in the correct orientation. The connection pins on the card should go in first and against the board.
+The micro SD card should click into place when correctly inserted.
 
-## Step 4: Setting up WiFi
+Now you can now connect the power back to the Raspberry Pi and you can watch the lights to see if the green lights are flashing to indicate it is booting.  Once the operating system is running, the lights should remain constant.
 
-To set up WiFi we will need a wired internet connection. Check if the Pi has an ip address on our ethernet.
+If you have a display attached, you should see the boot messages printed on the screen.  
 
-```bash
-$ ip addr
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host
-       valid_lft forever preferred_lft forever
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    link/ether b8:27:eb:1e:07:b5 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.105/24 brd 192.168.1.255 scope global eth0
-       valid_lft forever preferred_lft forever
-    inet6 fe80::a6b3:b6ac:6a77:57ed/64 scope link
-       valid_lft forever preferred_lft forever
-3: wlan0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
-    link/ether b8:27:eb:4b:52:e0 brd ff:ff:ff:ff:ff:ff
-```
-Our ethernet connection `eth0` has an ip address of `192.168.1.105`. First you want to update Pi's repository list and download the updates with the following command:
+## Step 5: Remotely access your Raspberry Pi
 
-```bash
-$ sudo apt update && sudo apt -y upgrade
-```
-Next, we want to install new network manager.
+--- show the steps for ssh-ing to the rpi
 
-```bash
-$ sudo apt install network-manager
-```
-Next, we install vim.
+## Step 6: Setting up WiFi (optional)
 
-```bash
-$ sudo apt install vim
-```
+--- show thte steps for setting up local WIFI and remote WiFi
 
-Next, you need to disable the old network manager
 
-```bash
-$ sudo systemctl disable dhcpcd.service
-```
-Next, you need to stop the old network manager, dhcpcd
+## Step 7: Download Source code and Tools for Linux
 
-```bash
-$ sudo systemctl stop dhcpcd.service
-```
+### 7.1 Download Tools
 
-Make sure that dhcpcd is disable and stopped with `systemctl status dhcpcd.service` command.
+Now let's install necessary programs.
 
 ```text
-$ sudo systemctl status dhcpcd.service
-● dhcpcd.service - dhcpcd on all interfaces
-   Loaded: loaded (/lib/systemd/system/dhcpcd.service; disabled; vendor preset: enabled)
-  Drop-In: /etc/systemd/system/dhcpcd.service.d
-           └─wait.conf
-   Active: inactive (dead) since Fri 2018-05-18 05:12:30 UTC; 3s ago
-  Process: 6379 ExecStop=/sbin/dhcpcd -x (code=exited, status=0/SUCCESS)
- Main PID: 558 (code=exited, status=0/SUCCESS)
-
-May 18 05:10:21 raspberrypi dhcpcd[558]: wlan0: new hardware address: 7e:1e:ce:10:7d:0c
-May 18 05:12:29 raspberrypi systemd[1]: Stopping dhcpcd on all interfaces...
-May 18 05:12:29 raspberrypi dhcpcd[6379]: sending signal TERM to pid 558
-May 18 05:12:29 raspberrypi dhcpcd[6379]: waiting for pid 558 to exit
-May 18 05:12:29 raspberrypi dhcpcd[558]: received SIGTERM, stopping
-May 18 05:12:29 raspberrypi dhcpcd[558]: wlan0: removing interface
-May 18 05:12:29 raspberrypi dhcpcd[558]: eth0: removing interface
-May 18 05:12:30 raspberrypi dhcpcd[6379]: sending signal TERM to pid 558
-May 18 05:12:30 raspberrypi dhcpcd[6379]: waiting for pid 558 to exit
-May 18 05:12:30 raspberrypi systemd[1]: Stopped dhcpcd on all interfaces.
+sudo apt install git bc vim libncurses5-dev make gcc ccache
 ```
-On the third line that starts with `Loaded:` notice that it states `disabled`. The *disabled* status will make sure the dhcpcd network manager will not start on reboot, alternatively, *stopped* will stop it from running as indicated on the sixth line that starts with `Active:`; its status is `inactive (dead)`
 
-(Next step will be to take the interface down but since I don't have a monitor I can't test this)
+### 7.2 Download Source
 
-The line `managed=false` need to be changed to `managed=true` in `NetworkManager.conf` ie:
-
-```bash
-$ cat /etc/NetworkManager/NetworkManager.conf
-[main]
-plugins=ifupdown,keyfile
-
-[ifupdown]
-managed=false
-```
-To:
-
-```bash
-$ cat /etc/NetworkManager/NetworkManager.conf
-[main]
-plugins=ifupdown,keyfile
-
-[ifupdown]
-managed=true
-```
-Run command:
-
-```bash
-$ sudo nmtui
-```
-Will open a text based GUI:
+Now we will download kernel source code.
 
 ```text
-┌─┤ NetworkManager TUI ├──┐
-│                         │
-│ Please select an option │
-│                         │
-│ Edit a connection       │
-│ Activate a connection   │
-│ Set system hostname     │
-│                         │
-│ Quit                    │
-│                         │
-│                    <OK> │
-│                         │
-└─────────────────────────┘
-```
-Select `Edit a connection` then `<Add>`. Then select `Wi-Fi` from the list.
-
-On the security portion, if the router is using the default `WPA2-PSK [AES]` then:
-
-```bash
-┌───────────────────────────┤ Edit Connection ├───────────────────────────┐
-│                                                                        ↑│
-│         Profile name Wi-Fi-Home______________________________          ▮│
-│               Device wlan0 (B8:27:EB:4B:52:E0)_______________          ▒│
-│                                                                        ▒│
-│ ╤ WI-FI                                                       <Hide>   ▒│
-│ │               SSID NETGEAR_________________________________          ▒│
-│ │               Mode <Client>                                          ▒│
-│ │                                                                      ▒│
-│ │           Security <WPA & WPA2 Personal>                             ▒│
-│ │           Password **************__________________________          ▒│
-│ │                    [ ] Show password                                 ▒│
-│ │                                                                      ▒│
-│ │              BSSID ________________________________________          ▒│
-│ │ Cloned MAC address ________________________________________          ▒│
-│ │                MTU __________ (default)                              ▒│
-│ └                                                                      ▒│
-│                                                                        ▒│
-│ ═ IPv4 CONFIGURATION <Automatic>                              <Show>   ▒│
-│ ═ IPv6 CONFIGURATION <Automatic>                              <Show>   ▒│
-│                                                                        ↓│
-└─────────────────────────────────────────────────────────────────────────┘
+cd ~
+git clone --depth 1 https://github.com/raspberrypi/linux.git
 ```
 
-(Here students can add there home connect and once they plug power to their pi their home router should automatically connect and send the ip to slack.)
+To use the same configuration as our current kernel we need to enable configs module.
 
-```bash
-$ ip addr
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host
-       valid_lft forever preferred_lft forever
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    link/ether b8:27:eb:1e:07:b5 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.105/24 brd 192.168.1.255 scope global dynamic eth0
-       valid_lft 86379sec preferred_lft 86379sec
-    inet6 fe80::6caa:14e1:c0ba:104a/64 scope link
-       valid_lft forever preferred_lft forever
-3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    link/ether b8:27:eb:4b:52:e0 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.4/24 brd 192.168.1.255 scope global dynamic wlan0
-       valid_lft 86379sec preferred_lft 86379sec
-    inet6 fe80::7bf0:43e5:64fc:415f/64 scope link
-       valid_lft forever preferred_lft forever
+```text
+sudo modprobe configs
 ```
-WiFi works!
+
+Make sure to `cd` into top level of the kernel source directory.
+
+```text
+cd ~/linux
+```
+
+Next we copy the current running kernel config file to our kernel source directory.  We uncompress the virtual file containing the current configuration using `zcat` and place the file into `.config` in the `~/linux` directory.  This configuration file specifies the options for building a kernel. We want to build one exactly like the one currently running, except we will add our own system call.
+
+```text
+zcat /proc/config.gz > .config
+```
+> Note: If you get an error that config.gz was not found, make sure configs module is loaded
+
+To edit .config file using a menu run:
+```text
+make menuconfig
+```
+Once the character based menuing is displayed, scroll down to select:
+```text
+General setup --->
+```
+In the general setup menu, we want to select the name of our kernel version.  It is currently set to `-v7`, which is appended to the kernel file when we build it.  Scroll down to the local version and select it.
+```text
+(-v7) Local version - append to kernel release
+```
+Replace `-v7` with your name. Tab to the top directory and select `<Save>` and save it to the .config file (default).  Use left arrow to select the `Exit` from the general setup menu and left arrow again to select `Exit` from the `menuconfig` application.
+
+### 7.3 Compile the Kernel
+
+```text
+make -j4 CC="ccache gcc" modules dtbs zImage
+```
+
+This will take about two and a half hours the first time.  We are using the ccache utility to make subsequent compiles much faster.
+
+```text
+sudo make modules_install
+```
+Make sure to replace `<kernel_name>` with any name except the default's kernel name (i.e. `kernel7`).
+```text
+sudo cp arch/arm/boot/dts/*.dtb /boot/
+sudo cp arch/arm/boot/dts/overlays/*.dtb* /boot/overlays/
+sudo cp arch/arm/boot/dts/overlays/README /boot/overlays/
+sudo cp arch/arm/boot/zImage /boot/<kernel_name>.img
+```
+
+Replace `<kernel_name>` with any name you like.  Make sure **NOT** to name it `kenrel7` since this is the default kernel name already installed on your system. If you do so and your platform doesn't boot, you will have to start the assignment from the beginning!  (See 1.7)
+
+### 7.4 Telling the boot process to use your kernel
+When the system is booting, it gets the name of the kernel from the `config.txt` file that is located in the `boot` partition.  To specify that you want to load your new kernel, you must edit the `config.txt` file and add a line:
+```
+kernel=<kernel_name>.img
+```
+where <kernel_name> is the name you used in the `cp` command above to copy the kernel into the boot partition.
+
+### 7.5 Rebooting to your newly built Kernel
+```text
+ sudo reboot
+```
+You are now booting and running your newly built kernel.
+
+### 7.6 What if your new kernel does not run?
+
+If your kernel boots, but does not behave correctly, you can edit the `<device>/boot/.config` file and remove (or comment out) the `kernel=<kernel_name>.img` line, which will then default back to the original kernel.  Save the file and reboot.  You should be back to where you were before step 7.4 was performed.
+
+To recover from a bad kernel (one that will not boot) you need a second system to access the files on the SD card.  Turn OFF the power to your platform and remove the micro SD card.
+You will need to mount this device in another computer via an SD card reader or or USB converter. Once you have mounted the device, you can look in its boot partition.
+```
+ls <device>/boot
+```
+You can edit the `<device>/boot/.config` file and remove (or comment out) the `kernel=<kernel_name>.img` line, which will then default back to the original kernel.  Save the file back to the SD card, unmount the device, and place it back into platform. Turn the power back ON and your platform will boot the previously working kernel.
